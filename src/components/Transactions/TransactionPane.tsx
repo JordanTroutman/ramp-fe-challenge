@@ -1,14 +1,16 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { InputCheckbox } from "../InputCheckbox"
 import { TransactionPaneComponent } from "./types"
+import { useCustomFetch } from "src/hooks/useCustomFetch"
+// import { SetTransactionApprovalParams } from "src/utils/types"
+import { AppContext } from "../../utils/context"
 
 export const TransactionPane: TransactionPaneComponent = ({
   transaction,
+  approved,
   loading,
   setTransactionApproval: consumerSetTransactionApproval,
 }) => {
-  const [approved, setApproved] = useState(transaction.approved)
-
   return (
     <div className="RampPane">
       <div className="RampPane--content">
@@ -27,8 +29,6 @@ export const TransactionPane: TransactionPaneComponent = ({
             transactionId: transaction.id,
             newValue,
           })
-
-          setApproved(newValue)
         }}
       />
     </div>

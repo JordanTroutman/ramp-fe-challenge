@@ -36,7 +36,6 @@ export function App() {
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils]
   )
-
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
       loadAllTransactions()
@@ -51,7 +50,7 @@ export function App() {
         <hr className="RampBreak--l" />
 
         <InputSelect<Employee>
-          isLoading={isLoading}
+          isLoading={employeeUtils.loading}
           defaultValue={EMPTY_EMPLOYEE}
           items={employees === null ? [] : [EMPTY_EMPLOYEE, ...employees]}
           label="Filter by employee"
@@ -63,9 +62,12 @@ export function App() {
           onChange={async (newValue) => {
             if (newValue === null) {
               return
+              // Empty employees loads all transactions
+            } else if (newValue === EMPTY_EMPLOYEE) {
+              await loadAllTransactions()
+            } else {
+              await loadTransactionsByEmployee(newValue.id)
             }
-
-            await loadTransactionsByEmployee(newValue.id)
           }}
         />
 
@@ -73,18 +75,22 @@ export function App() {
 
         <div className="RampGrid">
           <Transactions transactions={transactions} />
-
-          {transactions !== null && (
-            <button
-              className="RampButton"
-              disabled={paginatedTransactionsUtils.loading}
-              onClick={async () => {
-                await loadAllTransactions()
-              }}
-            >
-              View More
-            </button>
-          )}
+          {/* Only show load more when there's no transactions by employee and
+           * there are no more transactions.
+           */}
+          {transactions !== null &&
+            transactionsByEmployee === null &&
+            paginatedTransactions?.nextPage !== null && (
+              <button
+                className="RampButton"
+                disabled={paginatedTransactionsUtils.loading}
+                onClick={async () => {
+                  await loadAllTransactions()
+                }}
+              >
+                View More
+              </button>
+            )}
         </div>
       </main>
     </Fragment>
